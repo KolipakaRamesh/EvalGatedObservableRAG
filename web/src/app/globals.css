@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8fafc;
+  --foreground: #020617;
+  --glass: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(226, 232, 240, 0.5);
+  --brand-blue: #2563eb;
+  --brand-emerald: #059669;
+  --brand-slate: #475569;
+}
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  background: #020617 !important;
+  box-sizing: border-box;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  color: var(--foreground);
+  font-family: 'Outfit', system-ui, sans-serif;
+}
+
+/* Professional Glassmorphism */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  @apply rounded-xl transition-all duration-300;
+}
+
+.glass-card:hover {
+  @apply border-blue-200/50 shadow-lg shadow-blue-50/20 translate-y-[-1px];
+}
+
+/* Oceanic Slate Theme Groups */
+.group-live {
+  @apply bg-gradient-to-br from-blue-50/30 to-indigo-50/10 border-blue-100/50;
+}
+
+.group-eval {
+  @apply bg-gradient-to-br from-emerald-50/30 to-teal-50/10 border-emerald-100/50;
+}
+
+/* Terminal Console Styles */
+.console-bg {
+  background: #020617;
+  @apply border border-slate-800 rounded-lg shadow-2xl;
+}
+
+.console-text {
+  font-family: 'JetBrains Mono', monospace;
+  @apply text-[10px] leading-relaxed;
+}
+
+/* Gating switchboard components */
+.status-pill {
+  @apply text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1.5 shadow-sm;
+}
+
+/* No Scrollbar Utility */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Custom Text Effects */
+.heading-brand {
+  @apply font-bold text-slate-800 tracking-tightest;
+  letter-spacing: -0.04em;
+}
+
+.subtle-label {
+  @apply text-[8px] font-bold uppercase tracking-widest text-slate-400 select-none;
+}

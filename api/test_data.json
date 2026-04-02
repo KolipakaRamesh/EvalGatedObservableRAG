@@ -1,0 +1,14 @@
+[
+  {
+    "question": "What is the primary objective of an Eval-Gated RAG system?",
+    "ground_truth": "The primary objective is to ensure that only RAG configurations meeting specific performance and quality thresholds (like faithfulness and relevance) are deployed to production."
+  },
+  {
+    "question": "How does Pinecone contribute to this architecture?",
+    "ground_truth": "Pinecone provides the vector storage and retrieval capabilities, allowing the system to find relevant context for user queries."
+  },
+  {
+    "question": "What role does OpenRouter play?",
+    "ground_truth": "OpenRouter orchestrates various LLMs, providing a unified API to access different models and track their performance."
+  }
+]

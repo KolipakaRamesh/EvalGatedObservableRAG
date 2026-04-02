@@ -1,0 +1,66 @@
+# Node.js
+node_modules/
+.next/
+out/
+build/
+dist/
+.vercel
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+bin/
+lib/
+include/
+share/
+.pytest_cache/
+.coverage
+.cache
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environment / Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+
+# Data / Temporary
+tmp/
+data/
+*.json
+!web/package.json
+!web/tsconfig.json
+!web/next.config.ts
+!api/test_data.json
+
+# OS / Tools
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.gemini/
+*.webp
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+
+# Site
+public/
+!web/public/
