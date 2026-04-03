@@ -32,30 +32,30 @@ The system operates on a continuous feedback loop:
 5.  **Gating**: If the `Faithfulness` score drops below `0.85`, the deployment status is flagged as **BLOCKED**.
 
 ```mermaid
-graph TD
-    %% Frontend Console
+flowchart TD
     User((User)) --> |Enters Query| UI[Next.js Dashboard]
-    UI --> |Live Metrics: TTFT, TPS, Cost| UI
     
-    %% Real-time Inference Pipeline
-    UI --> |POST /query| API[FastAPI Orchestrator]
-    API --> |1. Embed Query| Embed[OpenAI Embeddings]
-    Embed --> |2. Vector Search| Pinecone[(Pinecone Vector DB)]
-    Pinecone -.-> |Top-K Match| Context[Retrieved Context]
-    
-    Context --> |3. Prompt Injection| Gateway[OpenRouter Gateway]
-    Gateway -.-> |Streams RAG Output| API
-    API --> |4. Calculate Citations| UI
-    
-    %% Async Batch Evaluation
-    subgraph "The Evaluation Gate (Batch)"
-        Trigger[Initiate Benchmark] --> EvalEngine[Eval Engine]
-        EvalEngine --> RAGAS[RAGAS Evaluator]
-        RAGAS --> Metrics[Faithful, Relevancy, Precision, Recall]
+    subgraph "Real-Time Inference Pipeline"
+        UI --> |POST /query| API[FastAPI Orchestrator]
+        API --> |Embed Query| Pinecone[(Pinecone Vector DB)]
+        Pinecone --> |Top-K Context| API
         
-        Metrics --> GateDecision{Faithful >= 0.85?}
-        GateDecision -- Yes --> Promote[Deploy Verified Build ✅]
-        GateDecision -- No --> Block[Block Configuration ❌]
+        API --> |Prompt & Context| Gateway[OpenRouter Gateway]
+        Gateway --> |Stream Response| API
+        API --> |Calculate Live Metrics| UI
+    end
+    
+    subgraph "Evaluation Gate (Batch)"
+        Trigger((Benchmark Trigger)) --> EvalEngine[Eval Engine]
+        EvalEngine --> RAGAS[RAGAS Evaluator]
+        
+        RAGAS --> Metrics[Calculate: Faithful, Relevancy, Precision, Recall]
+        Metrics --> GateDecision{Score >= 0.85?}
+        
+        GateDecision -->|Pass| Promote[Deploy Verified Build]
+        GateDecision -->|Fail| Block[Block Configuration]
+        
+        API -.-> |Triggers on config change| Trigger
     end
 ```
 
