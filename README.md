@@ -8,6 +8,19 @@ This project provides an **Evaluation-Gated** RAG architecture designed to bridg
 
 ---
 
+## 📚 What's in the Knowledge Base?
+
+To make testing easy out-of-the-box, the Pinecone vector database (`evalgatedrag`) is currently seeded with documentation **about this project itself** (meta-RAG). 
+
+When interacting with the Live Inference console, try asking questions like:
+- *"What is the primary objective of an Eval-Gated RAG system?"*
+- *"How does Pinecone contribute to this architecture?"*
+- *"What role does OpenRouter play?"*
+
+You can replace this data at any time by dropping new documents into the `data/` folder and re-indexing.
+
+---
+
 ## 🏗 The Workflow (What Happens Here?)
 
 The system operates on a continuous feedback loop:
@@ -40,36 +53,37 @@ graph TD
 
 ## 📊 Metrics 101: How We Measure Success
 
-To provide a complete picture of RAG performance, we split our observability into three critical domains: **Quality (The Gate)**, **SLA (Performance)**, and **Efficiency (Production)**.
+To provide a complete picture of RAG performance, we separate our observability into two distinct workflows, exactly as they appear on the RAG Ops Console:
 
-### 1. Quality & Retrieval Metrics
-These metrics analyze the relationship between the **Query**, the **Retrieved Context**, and the **Generated Answer**.
+### 1. Session Inference [Live Metrics]
 
-| Metric | Category | What it measures |
+*(Triggered by the **"Run"** button in the Console)*
+
+To trigger this, type a question about your knowledge base into the **"Enter evaluation query..."** text box at the bottom of the trace console (e.g., *"What is the objective of an Eval-Gated RAG system?"* or *"How does OpenRouter work?"*), and hit **Run**. 
+
+When you do, the system performs a single real-time RAG inference. These SLA and performance metrics are calculated **on-the-fly** to measure the technical efficiency of the pipeline.
+
+- **TTFT (Time To First Token)**: *How fast does the AI start typing?* (Measured in milliseconds; lower is better).
+- **Throughput (TPS)**: *How fast does the AI read and write?* (Measured in tokens per second; higher is better).
+- **Cost/Req**: *How much money did this single question cost to answer?*
+- **Global p95 Latency**: *In the worst-case scenario, how slow is the app for 95% of your users?*
+- **Citation Coverage**: *Did the AI actually show its work?* (What percentage of the background knowledge it retrieved did it actually quote in the final answer).
+
+---
+
+### 2. Quality Benchmarking [Batch Metrics]
+
+*(Triggered by the **"Initiate Benchmark"** button in the Deployment Gate)*
+
+When you hit "Initiate Benchmark", the system runs your current model configuration against a pre-defined dataset (`test_data.json`). These are deep evaluation metrics powered by the **RAGAS framework**. Because these evaluations use an LLM-as-a-judge (introducing high latency), they are run **asynchronously on a curated batch of test queries** to decide if a build is good enough to deploy.
+
+| Metric | In Plain English | What it means for the User |
 | :--- | :--- | :--- |
-| **Faithfulness** | RAGAS | Are all facts in the answer derived *only* from the context? |
-| **Answer Relevancy** | RAGAS | Does the answer actually address the user's intent? |
-| **Context Precision** | RAGAS | Is the most relevant information ranked first in retrieval? |
-| **Context Recall** | RAGAS | Does the retrieved data contain *all* the facts needed? |
-| **Citation Coverage** | Custom | % of retrieved context chunks explicitly cited in the answer. |
-
----
-
-### 2. SLA & Performance Metrics
-These metrics measure the technical efficiency of the inference pipeline and ensure the system meets production SLAs.
-
-- **TTFT (Time To First Token)**: The delay (ms) between the user's hit and the first character appearing.
-  - *Goal*: `< 150ms`. Impacts perceived speed.
-- **p50 Latency (Median)**: The average end-to-end response time for 50% of users.
-- **p95 Latency (Tail)**: The maximum response time for 95% of users. Critical for catching performance bottlenecks.
-- **TPS (Tokens Per Second)**: The "reading speed" of the stream.
-  - *Goal*: `> 30 tps`.
-- **Failure Rate**: The percentage of requests that result in a 5xx error or LLM timeout.
-
----
-
-### 3. Production Efficiency
-- **Cost Per Request**: Real-time estimation of USD cost based on token counts (Input + Output) and model pricing tiers.
+| **Faithful** | *Did the AI hallucinate?* | Ensures the AI isn't making things up. It must only use facts found in your Knowledge Base. |
+| **Relevance** | *Did the AI answer the actual question?* | Ensures the AI didn't go off-topic or give a generic, unhelpful answer. |
+| **Precision** | *Did we find the right documents immediately?* | Ensures the database is surfacing the *best* information right at the top of the search results. |
+| **Recall** | *Did we miss any important documents?* | Ensures the AI has *all* the puzzle pieces it needs to give a complete answer, with no missing context. |
+| **Failure Rate** | *Did the system crash?* | Ensures the system is stable and the API isn't throwing errors (0% means perfect stability). |
 
 ---
 

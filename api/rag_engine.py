@@ -106,7 +106,8 @@ class RAGEngine:
         if model is None:
             model = self.default_model
             
-        prompt = f"Context:\n{' '.join(context)}\n\nQuery: {query}\nAnswer:"
+        formatted_context = "\n".join([f"[{i+1}] {c}" for i, c in enumerate(context)])
+        prompt = f"System: Use the following context to answer the user query. You MUST cite your facts using the bracketed numbers like [1] or [2] whenever you use information from a context chunk.\n\nContext:\n{formatted_context}\n\nQuery: {query}\nAnswer:"
         
         start_time = time.time()
         ttft = 0

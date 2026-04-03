@@ -5,13 +5,13 @@
 @tailwind utilities;
 
 :root {
-  --background: #f8fafc;
-  --foreground: #020617;
-  --glass: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(226, 232, 240, 0.5);
-  --brand-blue: #2563eb;
-  --brand-emerald: #059669;
-  --brand-slate: #475569;
+  --background: #0f172a; /* slate-900 */
+  --foreground: #f8fafc; /* slate-50 */
+  --glass: rgba(30, 41, 59, 0.7); /* slate-800 translucent */
+  --glass-border: rgba(51, 65, 85, 0.6); /* slate-700 translucent */
+  --brand-blue: #3b82f6; /* blue-500 */
+  --brand-emerald: #10b981; /* emerald-500 */
+  --brand-slate: #64748b; /* slate-500 */
 }
 
 html, body {
@@ -20,7 +20,7 @@ html, body {
   height: 100% !important;
   width: 100% !important;
   overflow: hidden !important;
-  background: #020617 !important;
+  background: var(--background) !important;
   box-sizing: border-box;
 }
 
@@ -39,38 +39,39 @@ body {
 .glass-card {
   background: var(--glass);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
   @apply rounded-xl transition-all duration-300;
 }
 
 .glass-card:hover {
-  @apply border-blue-200/50 shadow-lg shadow-blue-50/20 translate-y-[-1px];
+  @apply border-blue-500/50 shadow-lg shadow-blue-500/10 translate-y-[-2px];
 }
 
 /* Oceanic Slate Theme Groups */
 .group-live {
-  @apply bg-gradient-to-br from-blue-50/30 to-indigo-50/10 border-blue-100/50;
+  @apply bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-blue-500/30;
 }
 
 .group-eval {
-  @apply bg-gradient-to-br from-emerald-50/30 to-teal-50/10 border-emerald-100/50;
+  @apply bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-emerald-500/30;
 }
 
 /* Terminal Console Styles */
 .console-bg {
-  background: #020617;
-  @apply border border-slate-800 rounded-lg shadow-2xl;
+  background: #020617; /* Very dark for console */
+  @apply border border-slate-700 rounded-lg shadow-2xl;
 }
 
 .console-text {
   font-family: 'JetBrains Mono', monospace;
-  @apply text-[10px] leading-relaxed;
+  @apply text-sm leading-relaxed;
 }
 
 /* Gating switchboard components */
 .status-pill {
-  @apply text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1.5 shadow-sm;
+  @apply text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-sm;
 }
 
 /* No Scrollbar Utility */
@@ -79,10 +80,9 @@ body {
 
 /* Custom Text Effects */
 .heading-brand {
-  @apply font-bold text-slate-800 tracking-tightest;
-  letter-spacing: -0.04em;
+  @apply font-bold text-slate-100 tracking-tight;
 }
 
 .subtle-label {
-  @apply text-[8px] font-bold uppercase tracking-widest text-slate-400 select-none;
+  @apply text-xs font-semibold uppercase tracking-wider text-slate-400 select-none;
 }

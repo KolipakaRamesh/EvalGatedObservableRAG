@@ -79,6 +79,7 @@ class EvalEngine:
                 faithfulness,
                 answer_relevancy,
                 context_precision,
+                context_recall,
             ],
             llm=self.eval_llm,
             embeddings=self.eval_embeddings

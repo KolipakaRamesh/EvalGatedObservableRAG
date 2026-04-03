@@ -22,7 +22,7 @@ const HighDensityMetric = ({ title, value, unit, status, icon: Icon, trend }: an
     </div>
     
     <div className="mt-2 flex items-baseline gap-1.5">
-      <span className="text-2xl font-bold tracking-tightest leading-none text-slate-800">{value}</span>
+      <span className="text-2xl font-bold tracking-tightest leading-none text-slate-100">{value}</span>
       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{unit}</span>
     </div>
     
@@ -214,20 +214,21 @@ export default function Dashboard() {
                   <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center shadow-md">
                     <Layers className="text-white" size={12} />
                   </div>
-                  <h1 className="text-xs font-bold text-slate-800 tracking-tightest">RAG Ops: Session Inference [Live]</h1>
+                  <h1 className="text-xs font-bold text-slate-100 tracking-tightest">RAG Ops: Session Inference [Live]</h1>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="status-pill bg-blue-50 text-blue-600 border border-blue-100">
+                  <span className="status-pill bg-blue-900/40 text-blue-400 border border-blue-800">
                     { (config?.live_model || '---').split('/').pop() }
                   </span>
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
               </div>
-              <div className="flex gap-2 overflow-hidden px-2 pb-2 h-20">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2 px-2 pb-2">
                 <HighDensityMetric title="TTFT" value={sessionMetrics.ttft || '--'} unit="ms" status={sessionMetrics.ttft > 200 ? 'warning' : 'good'} icon={Cpu} />
                 <HighDensityMetric title="Throughput" value={sessionMetrics.tps || '--'} unit="tps" status="good" icon={Activity} />
                 <HighDensityMetric title="Cost/Req" value={sessionMetrics.cost !== undefined ? `$${format(sessionMetrics.cost, 4)}` : '0.00' } unit="usd" icon={Activity} />
                 <HighDensityMetric title="Global p95" value={format(sessionMetrics.p95 || 0, 0)} unit="ms" status="good" icon={Activity} />
+                <HighDensityMetric title="Citation" value={format(sessionMetrics.citation || 0, 0)} unit="%" status="good" icon={Database} />
               </div>
             </div>
 
@@ -235,18 +236,20 @@ export default function Dashboard() {
             <div className="glass-card group-eval p-1.5 flex flex-col">
               <div className="flex justify-between items-center mb-2 px-3 pt-2">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck size={12} className="text-emerald-600" />
-                  <h2 className="text-[9px] font-bold text-emerald-800 uppercase tracking-widest">Quality Benchmarking [Batch]</h2>
+                  <ShieldCheck size={12} className="text-emerald-400" />
+                  <h2 className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">Quality Benchmarking [Batch]</h2>
                 </div>
-                <span className="status-pill bg-emerald-50 text-emerald-600 border border-emerald-100">
+                <span className="status-pill bg-emerald-900/40 text-emerald-400 border border-emerald-800">
                   { (config?.eval_model || '---').split('/').pop() }
                 </span>
               </div>
-              <div className="grid grid-cols-4 gap-2 px-2 h-20">
+              <div className="grid grid-cols-3 lg:grid-cols-6 gap-2 px-2 pb-2">
                 <HighDensityMetric title="Faithful" value={format(evalMetrics.faithfulness, 2)} unit="rag" status="good" icon={ShieldCheck} />
                 <HighDensityMetric title="Relevance" value={format(evalMetrics.relevance, 2)} unit="rag" status="good" icon={Terminal} />
+                <HighDensityMetric title="Precision" value={format(evalMetrics.precision, 2)} unit="rag" status="good" icon={Database} />
+                <HighDensityMetric title="Recall" value={format(evalMetrics.recall, 2)} unit="rag" status="good" icon={Database} />
                 <HighDensityMetric title="p95 Latency" value={evalMetrics.p95 || '--'} unit="ms" status="warning" icon={Activity} />
-                <HighDensityMetric title="Failure Rate" value={format(evalMetrics.failure, 1)} unit="%" status={evalMetrics.failure > 5 ? 'error' : 'good'} icon={ShieldCheck} />
+                <HighDensityMetric title="Failure" value={format(evalMetrics.failure, 1)} unit="%" status={evalMetrics.failure > 5 ? 'error' : 'good'} icon={ShieldCheck} />
               </div>
             </div>
           </div>
@@ -305,8 +308,8 @@ export default function Dashboard() {
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Enter evaluation query..."
-                  className="w-full bg-slate-950/80 border border-slate-800 rounded-lg pr-24 pl-10 py-2 text-[10px] text-white focus:outline-none focus:border-blue-500 transition-all font-mono"
+                  placeholder="Ask about Eval-Gated RAG, Pinecone, OpenRouter, or RAGAS..."
+                  className="w-full bg-slate-950/80 border border-slate-800 rounded-lg pr-24 pl-10 py-2 text-xs text-white focus:outline-none focus:border-blue-500 transition-all font-mono"
                 />
                 <Cpu size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                 <button 
@@ -333,14 +336,14 @@ export default function Dashboard() {
           <div className="glass-card p-3 flex flex-col h-full">
             <div className="flex items-center gap-2 mb-3">
               <ShieldCheck size={14} className="text-slate-500" />
-              <h2 className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Automated Deployment Gate</h2>
+              <h2 className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Automated Deployment Gate</h2>
             </div>
             
             <div className="space-y-2 mb-4">
               <div className="p-3 bg-slate-50/50 rounded-xl border border-slate-100/50">
                 <div className="flex justify-between items-center mb-2">
                   <span className="subtle-label">Production Threshold</span>
-                  <span className="text-[10px] font-bold text-slate-900">0.85</span>
+                  <span className="text-[10px] font-bold text-slate-100">0.85</span>
                 </div>
                 <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                   <div className="h-full bg-slate-400 w-[85%]" />
@@ -371,19 +374,19 @@ export default function Dashboard() {
                     <h3 className="subtle-label">Continuous Audit Logs</h3>
                 </div>
                 <div className={`px-2 py-0.5 rounded text-[8px] font-bold border ${
-                    gateStatus.passed ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-100'
+                    gateStatus.passed ? 'bg-emerald-900/40 text-emerald-400 border-emerald-800' : 'bg-blue-900/40 text-blue-400 border-blue-800'
                 }`}>
                     {gateStatus.passed ? 'VERIFIED' : 'PENDING'}
                 </div>
               </div>
               <div className="space-y-3">
                 {audits.map((item, i) => (
-                  <div key={i} className="flex justify-between items-center p-2 rounded-lg hover:bg-slate-50 transition-colors cursor-default">
+                  <div key={i} className="flex justify-between items-center p-2 rounded-lg hover:bg-slate-800 transition-colors cursor-default">
                     <span className="text-[9px] font-mono text-slate-400">{item.time}</span>
-                    <span className="text-[10px] font-bold text-slate-600">{item.task}</span>
+                    <span className="text-[10px] font-bold text-slate-200">{item.task}</span>
                     <div className="flex items-center gap-1.5">
-                      {item.status === 'PASS' ? <CheckCircle2 size={10} className="text-emerald-500" /> : <AlertTriangle size={10} className="text-rose-500" />}
-                      <span className={`font-bold text-[8px] uppercase tracking-widest ${item.status === 'PASS' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {item.status === 'PASS' ? <CheckCircle2 size={10} className="text-emerald-400" /> : <AlertTriangle size={10} className="text-rose-400" />}
+                      <span className={`font-bold text-[8px] uppercase tracking-widest ${item.status === 'PASS' ? 'text-emerald-400' : 'text-rose-400'}`}>
                         {item.status}
                       </span>
                     </div>
@@ -398,8 +401,8 @@ export default function Dashboard() {
                 disabled={benchmarking}
                 className={`py-3.5 px-6 font-bold text-[10px] uppercase tracking-widest rounded-xl transition-all border shadow-sm flex items-center justify-center gap-2 ${
                     benchmarking 
-                    ? 'bg-slate-50 text-slate-400 border-slate-100' 
-                    : 'bg-white text-blue-600 border-blue-200 hover:border-blue-500 hover:bg-blue-50/30'
+                    ? 'bg-slate-800 text-slate-500 border-slate-700' 
+                    : 'bg-blue-600 text-white border-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-500/20'
                 }`}
               >
                 {benchmarking ? <Activity size={12} className="animate-spin text-blue-300" /> : <Cpu size={12} />}
@@ -410,8 +413,8 @@ export default function Dashboard() {
                 onClick={handlePromote}
                 className={`py-3.5 px-6 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 ${
                     gateStatus.passed 
-                    ? 'bg-slate-900 hover:bg-emerald-600 hover:shadow-emerald-200' 
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    ? 'bg-emerald-600 hover:bg-emerald-500 hover:shadow-emerald-500/20' 
+                    : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
                 }`}
               >
                 <Zap size={12} className={gateStatus.passed ? 'text-emerald-400' : 'text-slate-300'} />
