@@ -33,19 +33,29 @@ The system operates on a continuous feedback loop:
 
 ```mermaid
 graph TD
-    User[User Query] --> Backend[FastAPI Backend]
-    Backend --> Pinecone[Pinecone Vector Search]
-    Pinecone --> Context[Retrieved Facts]
-    Context --> OpenRouter[LLM Generation]
-    OpenRouter --> Response[RAG Response]
+    %% Frontend Console
+    User((User)) --> |Enters Query| UI[Next.js Dashboard]
+    UI --> |Live Metrics: TTFT, TPS, Cost| UI
     
-    subgraph "The Evaluation Gate"
-        Response --> RAGAS[RAGAS Eval Suite]
-        RAGAS --> F[Faithfulness]
-        RAGAS --> R[Relevancy]
-        RAGAS --> Gates{Gate Thresholds}
-        Gates -- Score > 0.85 --> Verified[Verified Build]
-        Gates -- Score < 0.85 --> Blocked[Blocked Config]
+    %% Real-time Inference Pipeline
+    UI --> |POST /query| API[FastAPI Orchestrator]
+    API --> |1. Embed Query| Embed[OpenAI Embeddings]
+    Embed --> |2. Vector Search| Pinecone[(Pinecone Vector DB)]
+    Pinecone -.-> |Top-K Match| Context[Retrieved Context]
+    
+    Context --> |3. Prompt Injection| Gateway[OpenRouter Gateway]
+    Gateway -.-> |Streams RAG Output| API
+    API --> |4. Calculate Citations| UI
+    
+    %% Async Batch Evaluation
+    subgraph "The Evaluation Gate (Batch)"
+        Trigger[Initiate Benchmark] --> EvalEngine[Eval Engine]
+        EvalEngine --> RAGAS[RAGAS Evaluator]
+        RAGAS --> Metrics[Faithful, Relevancy, Precision, Recall]
+        
+        Metrics --> GateDecision{Faithful >= 0.85?}
+        GateDecision -- Yes --> Promote[Deploy Verified Build ✅]
+        GateDecision -- No --> Block[Block Configuration ❌]
     end
 ```
 
