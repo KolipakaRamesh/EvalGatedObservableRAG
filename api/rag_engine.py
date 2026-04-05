@@ -7,6 +7,7 @@ from langchain_openai import OpenAIEmbeddings
 import tiktoken
 from dotenv import load_dotenv
 from langsmith import wrappers
+from langfuse.openai import OpenAI as LangfuseOpenAI
 
 # Load env from root
 env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
@@ -28,17 +29,23 @@ class RAGEngine:
         else:
             self.index = None
             
-        # Initialize OpenRouter Client
-        raw_client = OpenAI(
+        # Initialize Clients
+        self.raw_client = OpenAI(
             base_url=self.base_url,
             api_key=self.openrouter_api_key,
         )
         
-        # Wrap for LangSmith tracing if enabled
+        # 1. LangChain Client
         if os.getenv("LANGCHAIN_TRACING_V2") == "true":
-            self.client = wrappers.wrap_openai(raw_client)
+            self.langchain_client = wrappers.wrap_openai(self.raw_client)
         else:
-            self.client = raw_client
+            self.langchain_client = self.raw_client
+            
+        # 2. Langfuse Client
+        self.langfuse_client = LangfuseOpenAI(
+            base_url=self.base_url,
+            api_key=self.openrouter_api_key
+        )
         
         # Initialize Embeddings via OpenRouter
         self.embeddings = OpenAIEmbeddings(
@@ -101,7 +108,7 @@ class RAGEngine:
         cost = (input_tokens * tier["in"] + output_tokens * tier["out"]) / 1_000_000
         return cost
 
-    def generate(self, query: str, context: List[str], model: Optional[str] = None) -> Dict[str, Any]:
+    def generate(self, query: str, context: List[str], model: Optional[str] = None, orchestrator: str = "langchain") -> Dict[str, Any]:
         """Generate response using OpenRouter with metrics tracking."""
         if model is None:
             model = self.default_model
@@ -113,8 +120,13 @@ class RAGEngine:
         ttft = 0
         response_text = ""
         
+        # Select Client
+        print(f"DEBUG: Using orchestrator: {orchestrator}")
+        active_client = self.langfuse_client if orchestrator == "langfuse" else self.langchain_client
+        print(f"DEBUG: Selected client type: {type(active_client)}")
+        
         # Stream to get TTFT
-        stream = self.client.chat.completions.create(
+        stream = active_client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
             stream=True,
@@ -151,7 +163,7 @@ class RAGEngine:
             "tokens": input_tokens + output_tokens
         }
 
-    def run_rag(self, query: str, model: Optional[str] = None, top_k: Optional[int] = None) -> Dict[str, Any]:
+    def run_rag(self, query: str, model: Optional[str] = None, top_k: Optional[int] = None, orchestrator: str = "langchain") -> Dict[str, Any]:
         """Complete RAG pipeline."""
         if model is None:
             model = self.default_model
@@ -159,6 +171,6 @@ class RAGEngine:
             top_k = int(os.getenv("DEFAULT_TOP_K", 5))
             
         context = self.retrieve(query, top_k)
-        result = self.generate(query, context, model)
+        result = self.generate(query, context, model, orchestrator)
         result["context"] = context
         return result

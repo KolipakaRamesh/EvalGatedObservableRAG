@@ -44,6 +44,7 @@ class QueryRequest(BaseModel):
     query: str
     model: Optional[str] = None
     top_k: Optional[int] = None
+    orchestrator: Optional[str] = "langchain"
 
 class QueryResponse(BaseModel):
     answer: str
@@ -90,7 +91,12 @@ async def get_config():
 async def query_rag(request: QueryRequest):
     try:
         # 1. Run RAG Inference
-        result = rag.run_rag(query=request.query, model=request.model, top_k=request.top_k)
+        result = rag.run_rag(
+            query=request.query, 
+            model=request.model, 
+            top_k=request.top_k,
+            orchestrator=request.orchestrator
+        )
         
         # 2. Track global metrics
         metrics_tracker.add_request(latency=result["ttft"], was_success=True, cost=result["cost"])

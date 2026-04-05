@@ -3,9 +3,10 @@ uvicorn
 pydantic
 python-dotenv
 openai
-pinecone-client
+pinecone
 ragas
 datasets
 langchain-openai
 pandas
 tiktoken
+langfuse

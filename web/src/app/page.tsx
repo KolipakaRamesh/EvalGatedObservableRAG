@@ -47,6 +47,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [benchmarking, setBenchmarking] = useState(false);
   const [config, setConfig] = useState({ live_model: '---', eval_model: '---' });
+  const [orchestrator, setOrchestrator] = useState('langchain');
   
   // Metrics: Session (Live Inference)
   const [sessionMetrics, setSessionMetrics] = useState({ 
@@ -99,13 +100,13 @@ export default function Dashboard() {
     if (!query.trim() || loading) return;
 
     setLoading(true);
-    addTrace(`Querying: "${query}"`, 'system');
+    addTrace(`Querying [${orchestrator.toUpperCase()}]: "${query}"`, 'system');
 
     try {
       const response = await fetch('http://localhost:8000/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query })
+        body: JSON.stringify({ query, orchestrator })
       });
 
       if (!response.ok) throw new Error('API Error');
@@ -302,8 +303,22 @@ export default function Dashboard() {
             </div>
             
             {/* Command Bar Hooked to Bottom of Console */}
-            <div className="px-3 py-2 bg-slate-900/50 border-t border-slate-800 shrink-0">
-              <form onSubmit={handleRunQuery} className="relative">
+            <div className="px-3 py-2 bg-slate-900 border-t border-slate-800 shrink-0 flex items-center gap-3">
+              <div className="flex bg-slate-950/80 border border-slate-800 rounded-lg p-1 shrink-0 shadow-inner">
+                <button 
+                  onClick={() => setOrchestrator('langchain')}
+                  className={`px-3 py-1.5 rounded-md text-[9px] font-bold tracking-tight transition-all duration-300 ${orchestrator === 'langchain' ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] scale-105' : 'text-slate-500 hover:text-slate-300'}`}
+                >
+                  LANGCHAIN
+                </button>
+                <button 
+                  onClick={() => setOrchestrator('langfuse')}
+                  className={`px-3 py-1.5 rounded-md text-[9px] font-bold tracking-tight transition-all duration-300 ${orchestrator === 'langfuse' ? 'bg-orange-600 text-white shadow-[0_0_15px_rgba(234,88,12,0.4)] scale-105' : 'text-slate-500 hover:text-slate-300'}`}
+                >
+                  LANGFUSE
+                </button>
+              </div>
+              <form onSubmit={handleRunQuery} className="relative flex-1">
                 <input 
                   type="text"
                   value={query}
