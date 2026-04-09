@@ -317,6 +317,12 @@ export default function Dashboard() {
                 >
                   LANGFUSE
                 </button>
+                <button 
+                  onClick={() => setOrchestrator('opik')}
+                  className={`px-3 py-1.5 rounded-md text-[9px] font-bold tracking-tight transition-all duration-300 ${orchestrator === 'opik' ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)] scale-105' : 'text-slate-500 hover:text-slate-300'}`}
+                >
+                  OPIK
+                </button>
               </div>
               <form onSubmit={handleRunQuery} className="relative flex-1">
                 <input 

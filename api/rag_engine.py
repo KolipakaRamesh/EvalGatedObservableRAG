@@ -8,6 +8,7 @@ import tiktoken
 from dotenv import load_dotenv
 from langsmith import wrappers
 from langfuse.openai import OpenAI as LangfuseOpenAI
+from opik.integrations.openai import track_openai
 
 # Load env from root
 env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
@@ -45,6 +46,12 @@ class RAGEngine:
         self.langfuse_client = LangfuseOpenAI(
             base_url=self.base_url,
             api_key=self.openrouter_api_key
+        )
+
+        # 3. Opik Client
+        self.opik_client = track_openai(
+            self.raw_client,
+            project_name=os.getenv("OPIK_PROJECT_NAME", "eval-gated-rag")
         )
         
         # Initialize Embeddings via OpenRouter
@@ -122,7 +129,13 @@ class RAGEngine:
         
         # Select Client
         print(f"DEBUG: Using orchestrator: {orchestrator}")
-        active_client = self.langfuse_client if orchestrator == "langfuse" else self.langchain_client
+        if orchestrator == "opik":
+            active_client = self.opik_client
+        elif orchestrator == "langfuse":
+            active_client = self.langfuse_client
+        else:
+            active_client = self.langchain_client
+            
         print(f"DEBUG: Selected client type: {type(active_client)}")
         
         # Stream to get TTFT

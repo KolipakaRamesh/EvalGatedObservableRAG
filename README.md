@@ -61,7 +61,7 @@ flowchart TD
 | **Vector DB** | **Pinecone** | **Semantic Memory**. Stores chunks of the knowledge base as high-dimensional vectors for context retrieval. |
 | **LLM Gateway** | **OpenRouter** | A unified API to switch between **GPT-4o, Claude 3.5, and Gemini** for both inference and evaluation. |
 | **Evaluation** | **RAGAS** | The industry standard for **LLM-as-a-judge**, mathematically proving RAG quality. |
-| **Observability** | **LangSmith / Langfuse** | **Dual-Trace Support**. Choose between LangChain/LangSmith or Langfuse via a toggle in the UI dashboard. |
+| **Observability** | **LangSmith / Langfuse / Opik** | **Triple-Trace Support**. Choose between LangChain, Langfuse, or Opik for tracing, metrics, and quality feedback. |
 
 ---
 
@@ -150,13 +150,28 @@ npm run dev
 
 ## 🔍 Deep-Dive: Observability Hub
 
-This project implements a **Dual-Orchestrator** system for full tracing visibility. You can toggle between these providers directly in the UI:
+This project implements a **Triple-Orchestrator** system for full tracing visibility. You can toggle between these providers directly in the UI:
 
 - **LangChain / LangSmith**: Provides deep component-level traces for LLM chains.
 - **Langfuse**: Provides an alternative, product-focused observability dashboard with built-in evaluation tracking.
+- **Opik (Comet)**: Our **Experimentation Engine**. Focused on multi-run comparisons, feedback loops, and RAGAS score correlation.
+
+### 🟣 Why Opik? (Comet Integration)
+While LangSmith and Langfuse provide excellent tracing, **Opik** is used here as a high-velocity **Experimentation Engine**:
+- **Consolidated Dashboard**: View RAGAS quality scores directly alongside the raw LLM traces in a single view.
+- **Feedback Signatures**: Opik simplifies the process of attaching quality labels to traces, making it easier to identify failure modes (e.g., "Why was this specific answer unfaithful?").
+- **Developer-Centric**: Provides an open-source, flexible interface for monitoring nested RAG pipelines without proprietary lock-in.
+
+### 📊 Metrics Handled by Opik
+In this project, Opik serves as the primary data-sink for:
+1.  **Inference Performance**: Captures **TTFT** (Time to First Token), **TPS** (Throughput), and **Total Latency**.
+2.  **Resource Utilization**: Tracks **Input/Output Tokens** and calculates the **Estimated Cost** per request.
+3.  **Quality Feedback**: RAGAS scores (Faithfulness, Relevancy, Precision, Recall) are logged into Opik as **Feedback Tags**, enabling you to filter and sort your execution history by quality metrics.
+
+---
 
 > [!TIP]
-> Use the **LANGCHAIN** vs **LANGFUSE** toggle in the dashboard command bar to switch tracing providers in real-time before running a query.
+> Use the **LANGCHAIN**, **LANGFUSE**, or **OPIK** toggle in the dashboard command bar to switch tracing providers in real-time before running a query.
 
 ---
 
