@@ -58,10 +58,10 @@ flowchart TD
 | :--- | :--- | :--- |
 | **Backend** | **FastAPI** | High-performance, native Async support for streaming LLM responses and RAGAS evaluations. |
 | **Frontend** | **Next.js 16 / React 19** | A state-of-the-art developer experience with high-density, real-time dashboards and Framer Motion animations. |
-| **Vector DB** | **Pinecone** | Serverless vector database capable of scaling to millions of documents with sub-100ms latency. |
+| **Vector DB** | **Pinecone** | **Semantic Memory**. Stores chunks of the knowledge base as high-dimensional vectors for context retrieval. |
 | **LLM Gateway** | **OpenRouter** | A unified API to switch between **GPT-4o, Claude 3.5, and Gemini** for both inference and evaluation. |
 | **Evaluation** | **RAGAS** | The industry standard for **LLM-as-a-judge**, mathematically proving RAG quality. |
-| **Observability** | **LangSmith / Langfuse** | Dual-orchestrator support allows you to choose your preferred tracing provider for deep debugging. |
+| **Observability** | **LangSmith / Langfuse** | **Dual-Trace Support**. Choose between LangChain/LangSmith or Langfuse via a toggle in the UI dashboard. |
 
 ---
 
@@ -145,6 +145,49 @@ npm run dev
 | **`data/`** | **Knowledge Base**. (Raw text files and benchmark datasets). |
 | **`pipelines/`** | **Data Engineering**. (Ingestion, chunking, and Pinecone indexing). |
 | **`web/`** | **Next.js Frontend**. (Observability dashboard & deployment gate). |
+
+---
+
+## 🔍 Deep-Dive: Observability Hub
+
+This project implements a **Dual-Orchestrator** system for full tracing visibility. You can toggle between these providers directly in the UI:
+
+- **LangChain / LangSmith**: Provides deep component-level traces for LLM chains.
+- **Langfuse**: Provides an alternative, product-focused observability dashboard with built-in evaluation tracking.
+
+> [!TIP]
+> Use the **LANGCHAIN** vs **LANGFUSE** toggle in the dashboard command bar to switch tracing providers in real-time before running a query.
+
+---
+
+## 🗄️ Knowledge Base & Pinecone
+
+### What is Pinecone storing?
+Pinecone acts as the **Semantic Memory** for this project. It specifically stores:
+- **Vector Embeddings**: Mathematical representations of text chunks from your knowledge base (located in `data/sample_kb.txt`).
+- **Metadata**: Each vector is paired with the original raw text chunk, allowing the API to "retrieve" the exact text to feed into the LLM prompt.
+
+### Why use Pinecone?
+Standard databases query for exact matches. Pinecone queries for **meaning**. If a user asks a question about *"deployment rules"*, Pinecone will find chunks discussing *"evaluation gates"* and *"production thresholds"* even if the exact words don't match.
+
+---
+
+## 🏗️ Ingestion Pipeline (Adding Data)
+
+To update the knowledge base or add new documents:
+
+1. Place your `.txt` files in the `data/` directory.
+2. Run the ingestion script:
+   ```bash
+   cd pipelines
+   python ingest_documents.py
+   ```
+This script will:
+- Read your files and chunk them (500 characters with 50-character overlap).
+- Generate embeddings using the `EMBEDDING_MODEL` via OpenRouter.
+- Upsert the vectors and their corresponding text into your Pinecone index.
+
+---
 
 ---
 
