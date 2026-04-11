@@ -41,9 +41,11 @@ pip-delete-this-directory.txt
 
 # Data / Temporary
 tmp/
-data/
+data/*
+!data/sample_kb.txt
 *.json
 !web/package.json
+!web/package-lock.json
 !web/tsconfig.json
 !web/next.config.ts
 !api/test_data.json
